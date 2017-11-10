@@ -21,7 +21,8 @@ class ProductListAllPDF {
             //creating a directory in SD card
 //            val mydir = File(getExternalStorageDirectory().absolutePath + StaticValue.PATH_PRODUCT_REPORT) //PATH_PRODUCT_REPORT="/SIAS/REPORT_PRODUCT/"
 
-            val mydir = File(context.filesDir, StaticValue.PATH_PRODUCT_REPORT)
+//            val mydir = File(context.filesDir, StaticValue.PATH_PRODUCT_REPORT)
+            val mydir = File(context.filesDir.toString())
 
             if (!mydir.exists()) {
                 Log.e("1", "111")
@@ -34,7 +35,6 @@ class ProductListAllPDF {
 //                    + reportName + ".pdf") //reportName could be any name
 
             val mPath = context.filesDir.toString() +
-                    StaticValue.PATH_PRODUCT_REPORT +
                     reportName + ".pdf"
 
             Log.e("1", mPath)
@@ -42,8 +42,8 @@ class ProductListAllPDF {
             //constructing the PDF file
             val pdfFile = File(mPath)
 
-            //Creating a Document with size A4. Document class is available at  com.itextpdf.text.Document
-            val document = Document(PageSize.A4)
+            //Creating a Document with size A7. Document class is available at  com.itextpdf.text.Document
+            val document = Document(PageSize.A7)
 
             //assigning a PdfWriter instance to pdfWriter
             pdfWriter = PdfWriter.getInstance(document, FileOutputStream(pdfFile))
@@ -92,7 +92,7 @@ class ProductListAllPDF {
              * A chunk is the smallest significant part of text that can be added to a document.
              * Most elements can be divided in one or more Chunks. A chunk is a String with a certain Font
              */
-            val footer_poweredBy = Phrase("Powered By SIAS ERP", StaticValue.FONT_HEADER_FOOTER) //public static Font FONT_HEADER_FOOTER = new Font(Font.FontFamily.UNDEFINED, 7, Font.ITALIC);
+            val footer_poweredBy = Phrase("Powered By POS Team", StaticValue.FONT_HEADER_FOOTER) //public static Font FONT_HEADER_FOOTER = new Font(Font.FontFamily.UNDEFINED, 7, Font.ITALIC);
             val footer_pageNumber = Phrase("Page " + document.getPageNumber(), StaticValue.FONT_HEADER_FOOTER)
 
             // Header
@@ -138,11 +138,11 @@ class ProductListAllPDF {
             val paragraph = Paragraph()
 
             // Adding several title of the document. Paragraph class is available in  com.itextpdf.text.Paragraph
-            var childParagraph = Paragraph("PLUS Electronics Pvt. Ltd.", StaticValue.FONT_TITLE) //public static Font FONT_TITLE = new Font(Font.FontFamily.TIMES_ROMAN, 22,Font.BOLD);
+            var childParagraph = Paragraph("Customer Name 1", StaticValue.FONT_TITLE)
             childParagraph.alignment = Element.ALIGN_CENTER
             paragraph.add(childParagraph)
 
-            childParagraph = Paragraph("Product List", StaticValue.FONT_SUBTITLE) //public static Font FONT_SUBTITLE = new Font(Font.FontFamily.TIMES_ROMAN, 18,Font.BOLD);
+            childParagraph = Paragraph("Product List", StaticValue.FONT_SUBTITLE)
             childParagraph.alignment = Element.ALIGN_CENTER
             paragraph.add(childParagraph)
 
@@ -185,7 +185,7 @@ class ProductListAllPDF {
         @Throws(BadElementException::class)
         private fun createTable(reportBody: Paragraph) {
 
-            val columnWidths = floatArrayOf(5f, 5f, 5f, 2f) //total 4 columns and their width. The first three columns will take the same width and the fourth one will be 5/2.
+            val columnWidths = floatArrayOf(5f, 5f, 5f) //total 4 columns and their width. The first three columns will take the same width and the fourth one will be 5/2.
             val table = PdfPTable(columnWidths)
 
             table.widthPercentage = 100f //set table with 100% (full page)
@@ -197,28 +197,21 @@ class ProductListAllPDF {
                     StaticValue.FONT_TABLE_HEADER)) //Public static Font FONT_TABLE_HEADER = new Font(Font.FontFamily.TIMES_ROMAN, 12,Font.BOLD);
             cell.horizontalAlignment = Element.ALIGN_CENTER //alignment
             cell.backgroundColor = GrayColor(0.75f) //cell background color
-            cell.fixedHeight = 30f //cell height
-            table.addCell(cell)
-
-            cell = PdfPCell(Phrase("Brand Name",
-                    StaticValue.FONT_TABLE_HEADER))
-            cell.horizontalAlignment = Element.ALIGN_CENTER
-            cell.backgroundColor = GrayColor(0.75f)
-            cell.fixedHeight = 30f
+            cell.fixedHeight = StaticValue.CELL_FIXED_HEIGHT //cell height
             table.addCell(cell)
 
             cell = PdfPCell(Phrase("Category Name",
                     StaticValue.FONT_TABLE_HEADER))
             cell.horizontalAlignment = Element.ALIGN_CENTER
             cell.backgroundColor = GrayColor(0.75f)
-            cell.fixedHeight = 30f
+            cell.fixedHeight = StaticValue.CELL_FIXED_HEIGHT
             table.addCell(cell)
 
             cell = PdfPCell(Phrase("Unit",
                     StaticValue.FONT_TABLE_HEADER))
             cell.horizontalAlignment = Element.ALIGN_CENTER
             cell.backgroundColor = GrayColor(0.75f)
-            cell.fixedHeight = 30f
+            cell.fixedHeight = StaticValue.CELL_FIXED_HEIGHT
             table.addCell(cell)
 
             //End of adding table headers
@@ -228,20 +221,20 @@ class ProductListAllPDF {
 
             //Adding data into table
             for (i in 0 until arrayListRProductModel.size) { //
-                cell = PdfPCell(Phrase(arrayListRProductModel[i].name))
-                cell.fixedHeight = 28f
+                cell = PdfPCell(Phrase(arrayListRProductModel[i].name, StaticValue.FONT_BODY))
+                cell.fixedHeight = StaticValue.CELL_FIXED_HEIGHT
+                table.addCell(cell)
+//
+//                cell = PdfPCell(Phrase(arrayListRProductModel[i].brandName))
+//                cell.fixedHeight = 28f
+//                table.addCell(cell)
+
+                cell = PdfPCell(Phrase(arrayListRProductModel[i].categoryName, StaticValue.FONT_BODY))
+                cell.fixedHeight = StaticValue.CELL_FIXED_HEIGHT
                 table.addCell(cell)
 
-                cell = PdfPCell(Phrase(arrayListRProductModel[i].brandName))
-                cell.fixedHeight = 28f
-                table.addCell(cell)
-
-                cell = PdfPCell(Phrase(arrayListRProductModel[i].categoryName))
-                cell.fixedHeight = 28f
-                table.addCell(cell)
-
-                cell = PdfPCell(Phrase(arrayListRProductModel[i].unitName))
-                cell.fixedHeight = 28f
+                cell = PdfPCell(Phrase(arrayListRProductModel[i].unitName, StaticValue.FONT_BODY))
+                cell.fixedHeight = StaticValue.CELL_FIXED_HEIGHT
                 table.addCell(cell)
             }
 
